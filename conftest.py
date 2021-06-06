@@ -1,3 +1,6 @@
+import configparser
+from pathlib import Path
+
 import pytest
 import os
 
@@ -10,6 +13,13 @@ def pytest_addoption(parser):
     parser.addoption("--maximized", action="store_true", help="Maximize browser windows")
     parser.addoption("--headless", action="store_true", help="Run headless")
     parser.addoption("--browser", action="store", choices=["chrome", "firefox", "opera"], default="chrome")
+
+
+@pytest.fixture(scope='session')
+def config():
+    config = configparser.ConfigParser()
+    config.read(Path(__file__).parent / 'config.ini')
+    return config
 
 
 @pytest.fixture

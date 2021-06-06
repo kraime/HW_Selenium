@@ -1,37 +1,16 @@
-import pytest
+from pages.admin import AdminPage
 import time
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from locators.LoginAdminPage import LoginAdminPage
-
-URL_ADMIN_PAGE = "http://demo-opencart.ru/"
 
 
-# Параметризация тестовой функции для проверки Title
-@pytest.mark.parametrize("url, title", [
-    ("http://demo-opencart.ru/admin/", "Авторизация")
-])
-def test_title_login_page(browser, url, title):
-    browser.get(url)
-    current_title = browser.title
-    assert current_title == title, "Неверный Title на странице Admin Page"
-
-
-def test_login_page(browser):
-    browser.get((URL_ADMIN_PAGE) + "/admin")
-    browser.find_element_by_id("input-username")
-    browser.find_element_by_name("password")
-    browser.find_element_by_css_selector("button[type='submit']")
-    browser.find_element_by_link_text("Забыли пароль?")
-    browser.find_element_by_xpath("//*[text()='OpenCart']")
-    time.sleep(2)  # Для демонстрации
-
-
-def test_login_page_external(browser):
-    browser.get((URL_ADMIN_PAGE) + "/admin")
-    browser.find_element(*LoginAdminPage.USERNAME_INPUT)
-    browser.find_element(*LoginAdminPage.PASSWORD_INPUT)
-    browser.find_element(*LoginAdminPage.SUBMIT_BUTTON)
-    browser.find_element(*LoginAdminPage.FORGOTTEN_PASSWORD)
-    browser.find_element(*LoginAdminPage.OPENCART_LINK)
-    time.sleep(2)  # Для демонстрации
+def test_create_new_order(browser, config):
+    admin_page = AdminPage(browser)
+    # Открывает страницу авторизации Admin_page
+    admin_page.open_admin_page()
+    # Производится авторизация на странице Admin_page
+    admin_page.login_to_admin_page(username=config['admin-auth']['username'], password=config['admin-auth']['password'])
+    # Проходимся по менюшке каталога и делаем клик Products
+    admin_page.go_to_catalog_products()
+    time.sleep(3)
+    admin_page.check_products_page()
+    # Попадает на форму добавления нового товара
+    admin_page.add_new_order()

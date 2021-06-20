@@ -1,12 +1,21 @@
+import os
+import pytest
+import logging
 import configparser
 from pathlib import Path
 
-import pytest
-import os
-
 from selenium import webdriver
+from selenium.webdriver.support.events import EventFiringWebDriver, AbstractEventListener
 
 DRIVERS = os.path.expanduser("~/Drivers")
+
+logging.basicConfig(level=logging.INFO, filename="../logs/logs.log")
+
+class MyListener(AbstractEventListener):
+
+    def on_exception(self, exception, driver):
+        logging.error(f'there is a {exception}')
+        driver.save_screenshot(f'../logs/{exception}.png')
 
 
 def pytest_addoption(parser):
@@ -51,9 +60,14 @@ def browser(request):
     else:
         raise ValueError("Driver not supported: {}".format(browser))
 
+    driver = EventFiringWebDriver(driver, MyListener())
+
     request.addfinalizer(driver.quit)
 
     if maximized:
         driver.maximize_window()
+    logger = logging.getLogger('BrowserLogger')
+    logger.info('Browser {} started'.format(browser))
+
 
     return driver

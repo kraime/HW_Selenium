@@ -3,9 +3,14 @@ import pytest
 import logging
 import configparser
 from pathlib import Path
-
+import allure
+import urllib.parse
+import time
 from selenium import webdriver
 from selenium.webdriver.support.events import EventFiringWebDriver, AbstractEventListener
+from browsermobproxy import Server, Client
+
+from utils.allure_helper import AllureCatchLogs
 
 DRIVERS = os.path.expanduser("~/Drivers")
 
@@ -22,6 +27,7 @@ def pytest_addoption(parser):
     parser.addoption("--maximized", action="store_true", help="Maximize browser windows")
     parser.addoption("--headless", action="store_true", help="Run headless")
     parser.addoption("--browser", action="store", choices=["chrome", "firefox", "opera"], default="chrome")
+    parser.addoption("--executor", action="store", default="192.168.1.247")
 
 
 @pytest.fixture(scope='session')
@@ -31,6 +37,41 @@ def config():
     return config
 
 
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_setup():
+    """Pytest setup before each test."""
+    with AllureCatchLogs():
+        yield
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_call():
+    """Allure hook."""
+    with AllureCatchLogs():
+        yield
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_teardown():
+    """Pytest teardown after each test."""
+    with AllureCatchLogs():
+        yield
+
+
+# Фикстура для запуска сервера посредника
+@pytest.fixture
+def remote(request):
+    browser = request.config.getoption("--browser")
+    executor = request.config.getoption("--executor")
+    wd = webdriver.Remote(
+        command_executor=f"http://{executor}:4444/wd/hub",
+        desired_capabilities={"browserName": browser},
+    )
+    wd.maximize_window()
+    request.addfinalizer(wd.quit)
+    return wd
+
+# Фикстура для запуска браузеров локально
 @pytest.fixture
 def browser(request):
     browser = request.config.getoption("--browser")

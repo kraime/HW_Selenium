@@ -31,7 +31,7 @@ class RegistrationPage(Base):
         self._input_text(input_lastname, 'Ivanoff')
 
         input_email = self._wait_element_to_be_clickable(RegistrationPageLocators.INPUT_EMAIL)
-        self._input_text(input_email, 'testuser1456@yandex.ru')
+        self._input_text(input_email, 'testuser14009@yandex.ru')
 
         input_telephone = self._wait_element_to_be_clickable(RegistrationPageLocators.INPUT_TELEPHONE)
         self._input_text(input_telephone, '79031231000')

@@ -8,6 +8,7 @@ class MainPage(Base):
         self.browser.get(self.url)
 
     def check_elements(self):
+        self.logger.info('check elements')
         assert self._find_element(HomePageLocators.SEARCH)
         assert self._find_elements(HomePageLocators.CART)
         assert self._find_element(HomePageLocators.UPPER_MENU)

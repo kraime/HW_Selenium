@@ -9,6 +9,7 @@ class ProductPage(Base):
         self.browser.get(self.url + self.path)
 
     def check_elements_on_product_page(self):
+        self.logger.info('check elements on product page')
         assert self._find_element(ProductPageLocators.CHECK_PRODUCTS_IN_SHOPING_CART)
         assert self._find_element(ProductPageLocators.REVIEW)
         assert self._find_element(ProductPageLocators.ADD_TO_CART)
